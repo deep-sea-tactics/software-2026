@@ -1,6 +1,6 @@
 import cv2
 
-cap = cv2.VideoCapture(0) 
+cap = cv2.VideoCapture(0) # change this based on ip address of camera feed (ie. 0 for local webcam, or for rpi cam feed, use the ip address of the rpi followed by the port number)
 
 if not cap.isOpened():
     print("Cannot open camera")
@@ -13,11 +13,30 @@ while True:
         print("Can't receive frame (stream end?). Exiting ...")
         break
 
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
     cv2.imshow('ROV CAM FEED', frame)
     if cv2.waitKey(1) == ord('q'):
         break
 
 cap.release()
 cv2.destroyAllWindows()
+
+
+
+"""
+class Camera:
+    def __init__(self, source):
+        self.cap = cv2.VideoCapture(source)
+
+    def get_frame(self):
+        ret, frame = self.cap.read()
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            return None
+        return frame
+
+    def release(self):
+        self.cap.release()
+
+
+"""
+

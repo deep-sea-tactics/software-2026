@@ -55,4 +55,7 @@ while running:
             # Add a threshold check as axes always send events
             if abs(event.value) > 0.1:
                  print(f"Axis {event.axis} moved on joystick instance {event.instance_id}. Value: {event.value}")
+                 
+        elif event.type == pygame.KEYDOWN:
+            print(f" {pygame.key.name(event.key)}")
         

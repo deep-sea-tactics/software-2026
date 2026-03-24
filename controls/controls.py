@@ -6,6 +6,8 @@ class Controller:
     def __init__(self, joystick, config_file = None, default_config = None):
         pygame.init()
         pygame.joystick.init()
+        screen = pygame.display.set_mode((1, 1))  # 1x1 pixel, basically invisible
+        pygame.display.iconify()                  # immediately minimizes it
         if config_file is None:
             self.config = copy.deepcopy(default_config)
         else:
@@ -16,9 +18,9 @@ class Controller:
             self.controller = pygame.joystick.Joystick(joystick)
             self.controller.init()
             num_hats = self.controller.get_numhats()
-            num_axis = self.controller.get_numaxis()
+            num_axis = self.controller.get_numaxes()
             num_buttons = self.controller.get_numbuttons()
-            print(f"Joystick Name: {self.config_bindingscontroller.get_name()}, Number of hats: {num_hats}, Number of axes: {num_axis}, Number of buttons: {num_buttons}")
+            print(f"Joystick Name: {self.controller.get_name()}, Number of hats: {num_hats}, Number of axes: {num_axis}, Number of buttons: {num_buttons}")
 
         else: 
             print("No joysticks connected. Would you like to use keyboard controls instead? (y/n)")
@@ -42,14 +44,15 @@ class Controller:
         print(f"[COMMAND] Action: '{action}' | Raw value: {raw_value}")
 
     
-    def handle_events(self, event):
+    def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
             elif event.type == pygame.JOYBUTTONDOWN:
                 print(f" {event.button}")
-                action = self._find_action("Controller", event.button)
+                action = self.find_action("Controller", event.button)
                 if action:
                     print(f"[Button {event.button}] -> '{action}'")
                     self.send_command(action, event.button)
@@ -60,7 +63,7 @@ class Controller:
             elif event.type == pygame.JOYHATMOTION:
                 print(f" {event.hat} {event.value}")
                 input_key = (event.hat, event.value)   # e.g. (0, (0, 1))
-                action = self._find_action("Controller", input_key)
+                action = self.find_action("Controller", input_key)
                 if action:
                     print(f"[Hat {event.hat} {event.value}] -> '{action}'")
                     self.send_command(action, event.value)
@@ -74,7 +77,7 @@ class Controller:
                     # Convert float to -1, 0, or 1
                     direction = 1 if event.value > 0 else -1
                     input_key = (event.axis, direction)  # e.g. (1, 1)
-                    action = self._find_action("Controller", input_key)
+                    action = self.find_action("Controller", input_key)
                     if action:
                         print(f"[Axis {event.axis} dir {direction}] -> '{action}' | value: {event.value:.2f}")
                         self.send_command(action, event.value)
@@ -83,10 +86,14 @@ class Controller:
             
 
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
+                    
                 print(f" {pygame.key.name(event.key)}")
                 key_name = pygame.key.name(event.key)
                 # Check if this key is bound to any action in the config
-                action = self._find_action("Keyboard", key_name)
+                action = self.find_action("Keyboard", key_name)
                 if action:
                     print(f"[Key '{key_name}'] -> '{action}'")
                     self.send_command(action, key_name)

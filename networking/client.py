@@ -1,32 +1,60 @@
+'''
+The client will be the RPI and its subsystems
+Reference Material
+https://www.digitalocean.com/community/tutorials/python-socket-programming-server-client#python-socket-example
+https://realpython.com/python-sockets/ 
+https://www.youtube.com/watch?v=5G_bNVKdECk 
+'''
 import socket
-'''
-The client will be the external device (laptop)
-'''
+from threading import Thread
+import os
+
 
 # Solely for test purposes
 # Run tests on same machine
-testing: bool = True;
+testing: bool = True
 
-if (not testing):
+if not testing:
     HOST = "192.168.0.225"  #225 is an arbitrary number
 else:
     # Returns current machine hostname
-    HOST = socket.gethostname() 
+    HOST = socket.gethostname()
 PORT = 5000
 
-clientSocket = socket.socket() # Get instance
-clientSocket.connect((HOST, PORT)) # Bind host and port
+class Client:
+    """Create and manage clients"""
+    def __init__(self, host, port):
+        self.client_socket = socket.socket() # Get instance
+        # Bind host and port
+        # Connection officially established
+        self.client_socket.connect((host, port))
+        self.id = input("Service ID: ")
 
-# Server-Client architecture officially established
+        self.talk_to_server()
 
-message = input(">")
+    def talk_to_server(self):
+        '''
+        Send over the client name then listen for messages on a seperate thread 
+        while sending remains on main
+        '''
+        self.client_socket.send(self.id.encode()) # send message
+        Thread(target = self.receive_message).start()
+        self.send_message()
 
-while message.lower().strip() != 'bye':
-    clientSocket.send(message.encode()) # send message
-    data = clientSocket.recv(1024) # receive response
+    def send_message(self):
+        '''Get user input then send the message to main thread'''
+        while True:
+            cli_input = input("")
+            cli_message = self.id + ": " + cli_input
+            self.client_socket.send(cli_message.encode())
 
-    print("Received from server: " + str(data))
+    def receive_message(self):
+        '''Receive server info from a seperate thread'''
+        while True:
+            server_message = self.client_socket.recv(1024).decode
+            if not str(server_message).strip():
+                os._exit(0)
+            print(server_message)
 
-    message = input(">")
-
-clientSocket.close()
+client = Client(HOST, PORT)
+# End-of-file (EOF)

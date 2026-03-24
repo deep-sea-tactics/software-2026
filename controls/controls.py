@@ -29,6 +29,19 @@ class Controller:
                 print("Exiting program.")
                 exit()
     
+
+    def find_action(self, input_type, input_key):
+        # Search through the config for the given input type and key
+        for action, bindings in self.config.get(input_type, {}).items(): # for action, bindings in self.config[input_type].items():
+            if input_key in bindings:
+                return action
+        return None
+
+    def send_command(self, action, raw_value):
+        # TODO: replace print with socket send to RPI
+        print(f"[COMMAND] Action: '{action}' | Raw value: {raw_value}")
+
+    
     def handle_events(self, event):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -36,16 +49,49 @@ class Controller:
                 exit()
             elif event.type == pygame.JOYBUTTONDOWN:
                 print(f" {event.button}")
-            
+                action = self._find_action("Controller", event.button)
+                if action:
+                    print(f"[Button {event.button}] -> '{action}'")
+                    self.send_command(action, event.button)
+                else:
+                    print(f"[Button {event.button}] -> No binding found")
+
+
             elif event.type == pygame.JOYHATMOTION:
                 print(f" {event.hat} {event.value}")
+                input_key = (event.hat, event.value)   # e.g. (0, (0, 1))
+                action = self._find_action("Controller", input_key)
+                if action:
+                    print(f"[Hat {event.hat} {event.value}] -> '{action}'")
+                    self.send_command(action, event.value)
+                else:
+                    print(f"[Hat {event.hat} {event.value}] -> No binding found")
+
 
             elif event.type == pygame.JOYAXISMOTION:
                 if abs(event.value) > 0.1:
                     print(f" {event.axis} {event.value}")
+                    # Convert float to -1, 0, or 1
+                    direction = 1 if event.value > 0 else -1
+                    input_key = (event.axis, direction)  # e.g. (1, 1)
+                    action = self._find_action("Controller", input_key)
+                    if action:
+                        print(f"[Axis {event.axis} dir {direction}] -> '{action}' | value: {event.value:.2f}")
+                        self.send_command(action, event.value)
+                    else:
+                        print(f"[Axis {event.axis} dir {direction}] -> No binding found")
             
+
             elif event.type == pygame.KEYDOWN:
                 print(f" {pygame.key.name(event.key)}")
+                key_name = pygame.key.name(event.key)
+                # Check if this key is bound to any action in the config
+                action = self._find_action("Keyboard", key_name)
+                if action:
+                    print(f"[Key '{key_name}'] -> '{action}'")
+                    self.send_command(action, key_name)
+                else:
+                    print(f"[Key '{key_name}'] -> No binding found")
             
     
     def config_bindings(self, action_name, input_type, index, value = None):
@@ -106,5 +152,23 @@ ctrl.config_bindings("Forward", "Controller", index=1, value="DPadUp")
 controller.save_bindings("custom_config.py") # Save the current config to a file
 
 
+
+
+
+from default_config import default_config
+
+ctrl = Controller(joystick=0, default_config=default_config)
+
+# Assign some bindings
+ctrl.config_bindings("Forward",  "Controller", index=0, value=(1, 1))   # axis 1 pushed forward
+ctrl.config_bindings("Backward", "Controller", index=0, value=(1, -1))  # axis 1 pushed backward
+ctrl.config_bindings("Stop All", "Controller", index=0, value=0)        # button 0
+ctrl.config_bindings("Up",       "Controller", index=0, value=(0, (0, 1)))  # hat up
+ctrl.config_bindings("Forward",  "Keyboard",   index=0, value="w")
+ctrl.config_bindings("Forward",  "Keyboard",   index=1, value="up")
+
+# Main loop
+while True:
+    ctrl.handle_events()
 
 """

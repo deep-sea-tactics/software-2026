@@ -1,3 +1,13 @@
+
+# Binding formats:
+#   Button:  integer              e.g. 0, 1, 2...
+#   Axis:    (axis_num, dir)      e.g. (1, 1) = pushed forward, (1, -1) = pushed backward
+#   Hat:     (hat_index, (x, y)) e.g. (0, (0, 1)) = up, (0, (0, -1)) = down
+#   Key:     string               e.g. "w", "space", "up"
+#
+# Each action: [primary, fallback]
+
+
 default_config = {
     "Controller": {
         "Up":                           [None, None],

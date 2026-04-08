@@ -14,7 +14,8 @@ import os
 # Run tests on same machine
 testing: bool = False
 
-HOST = "0.0.0.0"
+# host is the ip of the server, can be found by running "ipconfig" in terminal and looking for IPv4 address
+HOST = "192.168.0.224" 
 PORT = 5000
 
 class Client:
@@ -24,6 +25,7 @@ class Client:
         self.client_socket = socket.socket() # Get instance
         # Bind host and port
         # Connection officially established
+        print(host + ":" + str(port))
         self.client_socket.connect((host, port))
         self.id = input("Service ID: ")
 

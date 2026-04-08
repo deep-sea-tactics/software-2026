@@ -12,10 +12,10 @@ import os
 
 # Solely for test purposes
 # Run tests on same machine
-testing: bool = True
+testing: bool = False
 
 if not testing:
-    HOST = "192.168.0.225"  #225 is an arbitrary number
+    HOST = "192.168.0.43"  
 else:
     # Returns current machine hostname
     HOST = socket.gethostname()

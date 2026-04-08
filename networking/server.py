@@ -10,11 +10,11 @@ from threading import Thread
 
 # Solely for test purposes
 # Run tests on same machine
-testing: bool = True
+testing: bool = False
 
 if not testing:
     # Double check if this is the right IP address
-    HOST = "192.168.0.1"
+    HOST = "192.168.0.1" 
 else:
     # Returns current machine hostname
     HOST = socket.gethostname()

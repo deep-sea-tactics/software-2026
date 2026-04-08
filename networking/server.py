@@ -12,12 +12,7 @@ from threading import Thread
 # Run tests on same machine
 testing: bool = False
 
-if not testing:
-    # Double check if this is the right IP address
-    HOST = "192.168.0.1" 
-else:
-    # Returns current machine hostname
-    HOST = socket.gethostname()
+HOST = "127.0.0.1" # local host
 PORT = 5000
 
 class Server:
@@ -42,13 +37,13 @@ class Server:
             conn, address = self.server_socket.accept()
             print("Connection from " + str(address)) # Should be client's
 
-            data = conn.recv(1024).decode # receive data <=1024 bytes
+            data = conn.recv(1024).decode() # receive data <=1024 bytes
             if not data: # Checks if data is received
                 break
 
             # Create new client reference
             client = {'cli_id': data, 'cli_socket': conn}
-            print("from connected user " + str(conn))
+            print("from connected user " + str(data))
 
             # Create new thread for client
             Server.clients_list.append(client)
@@ -61,6 +56,10 @@ class Server:
         while True:
             # Listen for messages
             cli_msg = cli_socket.recv(1024).decode()
+
+            # Print for debugging purposes
+            print(str(cli_msg))
+
             # if message is bye remove clinet
             if cli_msg.lower().strip() == str(cli_id) + ": bye":
                 Server.clients_list.remove(client)

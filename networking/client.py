@@ -14,7 +14,7 @@ import os
 # Run tests on same machine
 testing: bool = False
 
-HOST = "127.0.0.1" # local host
+HOST = "0.0.0.0"
 PORT = 5000
 
 class Client:

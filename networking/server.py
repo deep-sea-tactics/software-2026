@@ -12,8 +12,8 @@ from threading import Thread
 # Run tests on same machine
 testing: bool = False
 
-HOST = "127.0.0.1" # local host
-PORT = 5000
+HOST = "0.0.0.0" # local host
+PORT = 5000 # make sure to unlock this port on firewall settings
 
 class Server:
     """Create and manage server"""
@@ -24,7 +24,8 @@ class Server:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Get instance
         self.server_socket.bind((host, port)) # Bind host and port
         self.server_socket.listen(5) # Enables server to accept connections
-        print('Server awating connection')
+        print('Server awaiting connection')
+        print(host + ":" + str(port))
 
     def listen(self):
         """

@@ -18,7 +18,7 @@ class Thruster:
     def set_speed(self, speed):
         # Speed should be in range -1.0 to 1.0
         if speed < -1.0 or speed > 1.0:
-            raise ValueError("Speed must be between -1.0 and 1.0")
+            print("Speed must be between -1.0 and 1.0")
         
         # Map speed to pulse width
         if speed >= 0:

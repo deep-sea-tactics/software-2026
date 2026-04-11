@@ -86,6 +86,7 @@ class Controller:
             
 
             elif event.type == pygame.KEYDOWN:
+                pygame.key.set_repeat(200, 50) # Enable key repeat with a delay of 200ms and interval of 50ms
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()

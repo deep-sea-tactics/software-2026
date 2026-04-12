@@ -9,21 +9,27 @@ import socket
 from threading import Thread
 import os
 
-# host is the ip of the server, can be found by running "ipconfig" in terminal and looking for IPv4 address
-HOST = "192.168.0.224" 
+# The server will be running on the same machine as the client for testing purposes, so we can use localhost
+# Change later!!
+HOST = "127.0.0.1" 
 PORT = 5000
 
 class ClientSocket:
     """Create and manage clients"""
    
-    def __init__(self, host, port, id):
+    def __init__(self, host, port, name):
         self.client_socket = socket.socket() # Get instance
         # Bind host and port
         # Connection officially established
         print(host + ":" + str(port))
-        self.client_socket.connect((host, port))
-        self.id = id
-
+        
+        try:
+            self.client_socket.connect((host, port))
+        except:
+            print("Failed to connect to server. Is the server running?")
+            os._exit(0)
+        
+        self.name = name
         self.talk_to_server()
 
     def talk_to_server(self):
@@ -31,14 +37,13 @@ class ClientSocket:
         Send over the client name then listen for messages on a seperate thread 
         while sending remains on main
         '''
-        self.client_socket.send(self.id.encode()) # send message
+        self.client_socket.send(self.name.encode()) # send message
         Thread(target = self.receive_message).start()
 
     def send_message(self, msg):
         '''Send a message to main thread'''
-        while True:
-            cli_message = self.id + ": " + msg
-            self.client_socket.send(cli_message.encode())
+        cli_message = self.name + ": " + msg
+        self.client_socket.send(cli_message.encode())
 
     def receive_message(self):
         '''Receive server info from a seperate thread'''
@@ -49,7 +54,7 @@ class ClientSocket:
             print("\n" + server_message)
 
 # Set up all necessary connections to the server
-necessary_connections = ["telemetry", "camera", "pilot"]
+necessary_connections = ["telemetry", "camera", "controls"]
 client_list = [] 
 
 for conn in range(len(necessary_connections)):
@@ -59,6 +64,7 @@ for conn in range(len(necessary_connections)):
 # Testing sending a lot of message across threads
 while True:
     for client in client_list:
-        client.send_message('Hello, server!')
+        print("Sending message from " + client.name)
+        client.send_message('Hello, server from port ' + str(PORT+necessary_connections.index(client.name)))
 
 # End-of-file (EOF) 

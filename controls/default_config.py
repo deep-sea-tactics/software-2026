@@ -29,6 +29,7 @@ default_config = {
         "Arm Move Forward":             [None, None],
         "Arm Move Backward":            [None, None],
         "Stop All":                     [None, None],
+        "Take Photo":                   [None, None],
     },
     "Keyboard": {
         "Up":                           ["space", None],
@@ -50,5 +51,6 @@ default_config = {
         "Arm Move Forward":             ["b", None],
         "Arm Move Backward":            ["n", None],
         "Stop All":                     ["q", None],
+        "Take Photo":                   ["return", None],
     }
 }

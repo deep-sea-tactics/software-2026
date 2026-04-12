@@ -6,28 +6,28 @@ https://realpython.com/python-sockets/
 https://www.youtube.com/watch?v=5G_bNVKdECk 
 '''
 import socket
+import select
 from threading import Thread
 
-# Solely for test purposes
-# Run tests on same machine
-testing: bool = False
-
 HOST = "0.0.0.0" # local host
-PORT = 5000 # make sure to unlock this port on firewall settings
+PORT = 5000 
 
-class Server:
-    """Create and manage server"""
-    clients_list = []
+listening_socks = [] # List of all listening sockets for select
+sending_socks = [] # List of all sending sockets for select
+
+class ServerSocket:
+    """Create and manage server sockets"""
+    client_list = []
 
     def __init__(self, host, port):
         """Inititalize a TCP socket """
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Get instance
         self.server_socket.bind((host, port)) # Bind host and port
         self.server_socket.listen(5) # Enables server to accept connections
-        print('Server awaiting connection')
-        print(host + ":" + str(port))
+        self.server_socket.setblocking(False) # Set non-blocking mode for select
+        print('This socket is listening on ' + host + ":" + str(port))
 
-    def listen(self):
+    def listen_for_client(self):
         """
         Listen for connections on the main thread
         Route connections to new threads for handling, adding to client list
@@ -47,7 +47,7 @@ class Server:
             print("from connected user " + str(data))
 
             # Create new thread for client
-            Server.clients_list.append(client)
+            ServerSocket.client_list.append(client)
             Thread(target=self.handle_new_client, args=(client,)).start()
 
     def handle_new_client(self, client):
@@ -63,7 +63,7 @@ class Server:
 
             # if message is bye remove clinet
             if cli_msg.lower().strip() == str(cli_id) + ": bye":
-                Server.clients_list.remove(client)
+                ServerSocket.client_list.remove(client)
                 cli_socket.close()
                 break
             else:
@@ -72,12 +72,21 @@ class Server:
 
     def broadcast_message(self, sender_id, message):
         '''Broadcast a message to all clients (testing purposes)'''
-        for cli in self.clients_list:
+        for cli in self.client_list:
             cli_id = cli['cli_id']
             cli_socket = cli['cli_socket']
             if cli_id != sender_id:
                 cli_socket.send(message.encode())
 
-test_server = Server(HOST, PORT)
-test_server.listen()
+# Create sockets and assign them a unique port
+for i in range(3):
+    server_socket = ServerSocket(HOST, PORT+i)
+    listening_socks.append(server_socket.server_socket)
+
+while True:
+    for read_socks, write_socks, except_socks in select.select(listening_socks, sending_socks, listening_socks):
+        for sock in read_socks:
+            print(sock.read())
+            sock.listen_for_client()
+
 # End-of-file (EOF)

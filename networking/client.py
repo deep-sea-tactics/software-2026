@@ -9,25 +9,20 @@ import socket
 from threading import Thread
 import os
 
-
-# Solely for test purposes
-# Run tests on same machine
-testing: bool = False
-
 # host is the ip of the server, can be found by running "ipconfig" in terminal and looking for IPv4 address
 HOST = "192.168.0.224" 
 PORT = 5000
 
-class Client:
+class ClientSocket:
     """Create and manage clients"""
    
-    def __init__(self, host, port):
+    def __init__(self, host, port, id):
         self.client_socket = socket.socket() # Get instance
         # Bind host and port
         # Connection officially established
         print(host + ":" + str(port))
         self.client_socket.connect((host, port))
-        self.id = input("Service ID: ")
+        self.id = id
 
         self.talk_to_server()
 
@@ -38,13 +33,11 @@ class Client:
         '''
         self.client_socket.send(self.id.encode()) # send message
         Thread(target = self.receive_message).start()
-        self.send_message()
 
-    def send_message(self):
-        '''Get user input then send the message to main thread'''
+    def send_message(self, msg):
+        '''Send a message to main thread'''
         while True:
-            cli_input = input("Your awesome message: ")
-            cli_message = self.id + ": " + cli_input
+            cli_message = self.id + ": " + msg
             self.client_socket.send(cli_message.encode())
 
     def receive_message(self):
@@ -55,5 +48,17 @@ class Client:
                 os._exit(0)
             print("\n" + server_message)
 
-client = Client(HOST, PORT)
-# End-of-file (EOF)
+# Set up all necessary connections to the server
+necessary_connections = ["telemetry", "camera", "pilot"]
+client_list = [] 
+
+for conn in range(len(necessary_connections)):
+    client = ClientSocket(HOST, PORT+conn, necessary_connections[conn])
+    client_list.append(client)
+
+# Testing sending a lot of message across threads
+while True:
+    for client in client_list:
+        client.send_message('Hello, server!')
+
+# End-of-file (EOF) 

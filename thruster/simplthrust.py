@@ -22,7 +22,7 @@ mixer = np.array([
 
 
 thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
-
+pi = pigpio.pi()
 
 esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
 esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
@@ -33,9 +33,8 @@ class ThrusterController:
         self.mixer = mixer
         self.thruster_pins = thruster_pins
         self.num_thrusters = len(thruster_pins)
-        self.pi = pigpio.pi()
         for pin in thruster_pins:
-            self.pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
+            pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
 
     def set_thrusters(self, input):
         # input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw]
@@ -48,4 +47,8 @@ class ThrusterController:
         pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range
     
         for i in range(self.num_thrusters):
-            self.pi.set_servo_pulsewidth(thruster_pins[i], pwm[i])  # Send PWM signal to each thruster
+            pi.set_servo_pulsewidth(thruster_pins[i], pwm[i])  # Send PWM signal to each thruster
+    
+    def stop_all(self):
+        for pin in self.thruster_pins:
+            pi.set_servo_pulsewidth(pin, esc_neutral)  # Set all thrusters to neutral to stop

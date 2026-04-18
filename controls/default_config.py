@@ -26,9 +26,6 @@ default_config = {
         "Diagonal Strafe Right Forward":[None, None],
         "Arm Open":                     [None, None],
         "Arm Close":                    [None, None],
-        "Arm Move Forward":             [None, None],
-        "Arm Move Backward":            [None, None],
-        "Stop All":                     [None, None],
         "Take Photo":                   [None, None],
     },
     "Keyboard": {
@@ -48,9 +45,22 @@ default_config = {
         "Diagonal Strafe Right Forward":["h", None],
         "Arm Open":                     ["f", None],
         "Arm Close":                    ["v", None],
-        "Arm Move Forward":             ["b", None],
-        "Arm Move Backward":            ["n", None],
         "Stop All":                     ["q", None],
         "Take Photo":                   ["return", None],
     }
+}
+
+ACTION_TO_DOF = {
+    "Forward":        ("surge",  1.0),
+    "Backward":       ("surge", -1.0),
+    "Strafe Left":    ("sway",  -1.0),
+    "Strafe Right":   ("sway",   1.0),
+    "Up":             ("heave",  1.0),
+    "Down":           ("heave", -1.0),
+    "Roll Left":      ("roll",  -1.0),
+    "Roll Right":     ("roll",   1.0),
+    "Pitch Up":       ("pitch",  1.0),
+    "Pitch Down":     ("pitch", -1.0),
+    "Yaw Left":       ("yaw",   -1.0),
+    "Yaw Right":      ("yaw",    1.0),
 }

@@ -122,7 +122,6 @@ class Controller:
     
     def _read_gamepad(self, vec):
         
-        
         for axis in range(self.controller.get_numaxes()):
             raw = self.controller.get_axis(axis)
             if abs(raw) < 0.08:  # deadzone

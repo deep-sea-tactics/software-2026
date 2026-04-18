@@ -1,17 +1,10 @@
-'''
-The client will be the RPI and its subsystems
-Reference Material
-https://www.digitalocean.com/community/tutorials/python-socket-programming-server-client#python-socket-example
-https://realpython.com/python-sockets/ 
-https://www.youtube.com/watch?v=5G_bNVKdECk 
-'''
 import socket
 from threading import Thread
 import os
 
-# The server will be running on the same machine as the client for testing purposes, so we can use localhost
-# Change later!!
-HOST = "127.0.0.1" 
+# The server's static IP address 
+# For reference: The RPI's IP address is 192.168.0.2
+HOST = "192.168.0.1" 
 PORT = 5000
 
 class ClientSocket:

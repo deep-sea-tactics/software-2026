@@ -1,6 +1,5 @@
 import pygame
 import copy #for deep copying the default config to avoid mutating it when creating new Controller instances
-import pprint #for complex data structures like dictionaries and lists, this will print them in a more readable format
 import numpy as np
 from default_config import ACTION_TO_DOF
 
@@ -9,8 +8,8 @@ class Controller:
         pygame.init()
         pygame.joystick.init()
         screen = pygame.display.set_mode((1, 1))  # 1x1 pixel, basically invisible
-        pygame.display.iconify()    
-        self.dof_to_index = {"surge": 0, "sway": 1, "heave": 2, "roll": 3, "pitch": 4, "yaw": 5}              # immediately minimizes it
+        pygame.display.iconify()    # immediately minimizes it
+        self.dof_to_index = {"surge": 0, "sway": 1, "heave": 2, "roll": 3, "pitch": 4, "yaw": 5}  
         if config_file is None:
             self.config = copy.deepcopy(default_config)
         else:
@@ -124,14 +123,13 @@ class Controller:
         
         for axis in range(self.controller.get_numaxes()):
             raw = self.controller.get_axis(axis)
-            if abs(raw) < 0.08:  # deadzone
-                continue
-            direction = 1 if raw > 0 else -1
-            input_key = (axis, direction)
-            action = self.find_action("Controller", input_key)
-            if action and action in ACTION_TO_DOF:
-                dof, scale = ACTION_TO_DOF[action]
-                vec[self.dof_to_index[dof]] += raw * scale
+            if abs(raw) > 0.1:  # deadzone
+                direction = 1 if raw > 0 else -1
+                input_key = (axis, direction)
+                action = self.find_action("Controller", input_key)
+                if action and action in ACTION_TO_DOF:
+                    dof, scale = ACTION_TO_DOF[action]
+                    vec[self.dof_to_index[dof]] += raw * scale
 
         for btn in range(self.controller.get_numbuttons()):
             if self.controller.get_button(btn):

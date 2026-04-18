@@ -36,6 +36,8 @@ class ThrusterController:
         for pin in thruster_pins:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
 
+    #input will be a 6 element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
+    #that will come from get_input_vector() func in controls.py, which will be called in the main loop of the program.
     def set_thrusters(self, input):
         # input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw]
         # Each element should be in the range [-1, 1]

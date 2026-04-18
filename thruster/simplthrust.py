@@ -54,3 +54,16 @@ class ThrusterController:
     def stop_all(self):
         for pin in self.thruster_pins:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Set all thrusters to neutral to stop
+
+
+
+"""
+while True:
+    # Example input vector for testing: [Surge, Sway, Heave, Roll, Pitch, Yaw]
+    input_vector = [0.5, 0.0, 0.0, 0.0, 0.0, 0.0]  # Move forward at half speed
+    thruster_controller.set_thrusters(input_vector)
+    time.sleep(1)  # Run for 1 second
+
+    thruster_controller.stop_all()  # Stop all thrusters
+    time.sleep(1)  # Wait for a moment before the next command
+"""

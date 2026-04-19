@@ -72,7 +72,7 @@ class Controller:
 
 
             elif event.type == pygame.JOYAXISMOTION:
-                if abs(event.value) > 0.1:
+                if abs(event.value) > 0.1: #if joystick moved pasts the deadzone
                     print(f" {event.axis} {event.value}")
                     # Convert float to -1, 0, or 1
                     direction = 1 if event.value > 0 else -1
@@ -115,7 +115,7 @@ class Controller:
                     self.controller = None
             '''''''''''''''''''''''
 
-    def _read_gamepad(self, vec):
+    def read_gamepad(self, vec):
         
         for axis in range(self.controller.get_numaxes()):
             raw = self.controller.get_axis(axis)
@@ -147,7 +147,7 @@ class Controller:
                         vec[self.dof_to_index[dof]] += scale
 
 
-    def _read_keyboard(self, vec):
+    def read_keyboard(self, vec):
         for key_name in self.keys_held:
             action = self.find_action("Keyboard", key_name)
             if action and action in ACTION_TO_DOF:
@@ -157,8 +157,8 @@ class Controller:
     def get_input_vector(self):
         vec = np.zeros(6)
         if self.controller:
-            self._read_gamepad(vec)
+            self.read_gamepad(vec)
         else:
-            self._read_keyboard(vec)
+            self.read_keyboard(vec)
         return np.clip(vec, -1.0, 1.0)    # Ensure values are between -1 and 1
     

@@ -6,7 +6,7 @@ import numpy as np
 # Inputs: [Surge, Sway, Heave, Roll, Pitch, Yaw]
 # Outputs: [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 
-# Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters [28]
+# Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters
 s = 0.707 
 
 mixer = np.array([

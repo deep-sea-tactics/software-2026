@@ -17,7 +17,7 @@ arm_neutral_width = 1500
 arm_open_width = 1400
 
 # Intialize pigpio
-pi = pigpio.pi()
+pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 class Arm:
     def __init__(self, pin):
@@ -34,9 +34,12 @@ class Arm:
     def stop(self):
         pi.set_servo_pulsewidth(self.pin, arm_neutral_width)
 
+# Testing
 armTest = Arm(arm_signal_pin)
 while True:
     armTest.open()
-    time.sleep(1)
+    time.sleep(2)
+    armTest.stop()
+    time.sleep(2)
     armTest.close()
-    time.sleep(1)
+    time.sleep(2)

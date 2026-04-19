@@ -22,7 +22,8 @@ mixer = np.array([
 
 
 thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
-pi = pigpio.pi()
+pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
+
 
 esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
 esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
@@ -35,6 +36,7 @@ class ThrusterController:
         self.num_thrusters = len(thruster_pins)
         for pin in thruster_pins:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
+            pi.set_PWM_frequency(pin, 50) # Set frequency to 50Hz
 
     #input will be a 6 element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
     #that will come from get_input_vector() func in controls.py, which will be called in the main loop of the program.
@@ -49,8 +51,27 @@ class ThrusterController:
         pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range
     
         for i in range(self.num_thrusters):
-            pi.set_servo_pulsewidth(thruster_pins[i], pwm[i])  # Send PWM signal to each thruster
+            print(self.thruster_pins[i])
+            pi.set_servo_pulsewidth(self.thruster_pins[i], pwm[i])  # Send PWM signal to each thruster
     
     def stop_all(self):
         for pin in self.thruster_pins:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Set all thrusters to neutral to stop
+
+# Testing
+thrusterTest = ThrusterController(mixer, [6])
+while True:
+    print("testing thrusters...")
+    # Full forward surge
+    input_vector = [1, 0, 0, 0, 0, 0]  
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(2)
+    
+    # Full backward surge
+    input_vector = [-1, 0, 0, 0, 0, 0]  
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(2)
+    
+    # Stop all thrusters
+    thrusterTest.stop_all()
+    time.sleep(2)

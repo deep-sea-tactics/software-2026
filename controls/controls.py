@@ -10,6 +10,8 @@ class Controller:
         screen = pygame.display.set_mode((1, 1))  # 1x1 pixel, basically invisible
         pygame.display.iconify()    # immediately minimizes it
         self.dof_to_index = {"surge": 0, "sway": 1, "heave": 2, "roll": 3, "pitch": 4, "yaw": 5}  
+        self.keys_held = set()  # Track currently held keys for repeat handling
+
         if config_file is None:
             self.config = copy.deepcopy(default_config)
         else:
@@ -84,6 +86,7 @@ class Controller:
             
 
             elif event.type == pygame.KEYDOWN:
+                self.keys_held.add(pygame.key.name(event.key))
                 pygame.key.set_repeat(200, 50) # Enable key repeat with a delay of 200ms and interval of 50ms
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
@@ -98,7 +101,10 @@ class Controller:
                     self.send_command(action, key_name)
                 else:
                     print(f"[Key '{key_name}'] -> No binding found")
-            
+
+            elif event.type == pygame.KEYUP:
+                self.keys_held.discard(pygame.key.name(event.key))  # Remove key from held set on release
+            ''''''''''''''''''''''
             elif event.type in (pygame.JOYDEVICEADDED, pygame.JOYDEVICEREMOVED):
                 pygame.joystick.quit()
                 pygame.joystick.init()
@@ -107,18 +113,8 @@ class Controller:
                     self.controller.init()
                 else:
                     self.controller = None
+            '''''''''''''''''''''''
 
-
-    def get_input_vector(self):
-        vec = np.zeros(6)
-        if self.controller:
-            self._read_gamepad(vec)
-        else:
-            self._read_keyboard(vec)
-        return np.clip(vec, -1.0, 1.0)    # Ensure values are between -1 and 1
-    
-
-    
     def _read_gamepad(self, vec):
         
         for axis in range(self.controller.get_numaxes()):
@@ -152,16 +148,17 @@ class Controller:
 
 
     def _read_keyboard(self, vec):
-        
-        keys = pygame.key.get_pressed()
-        
-        for key_const, pressed in enumerate(keys):
-            if not pressed:
-                continue
-            key_name = pygame.key.name(key_const)
+        for key_name in self.keys_held:
             action = self.find_action("Keyboard", key_name)
             if action and action in ACTION_TO_DOF:
                 dof, scale = ACTION_TO_DOF[action]
                 vec[self.dof_to_index[dof]] += scale
-            
+    
+    def get_input_vector(self):
+        vec = np.zeros(6)
+        if self.controller:
+            self._read_gamepad(vec)
+        else:
+            self._read_keyboard(vec)
+        return np.clip(vec, -1.0, 1.0)    # Ensure values are between -1 and 1
     

@@ -1,4 +1,3 @@
-from arm.arm import Arm
 from controls import Controller
 import pygame
 from default_config import default_config

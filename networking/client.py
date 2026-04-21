@@ -5,7 +5,8 @@ import os
 # The server's static IP address 
 # For reference: The RPI's IP address is 192.168.0.2
 HOST = "192.168.0.1" 
-PORT = 5000
+
+client_list = [] # List of all clients for later use with broadcasting messages
 
 class ClientSocket:
     """Create and manage clients"""
@@ -23,6 +24,7 @@ class ClientSocket:
             os._exit(0)
         
         self.name = name
+        client_list.append(self)
         self.talk_to_server()
 
     def talk_to_server(self):
@@ -47,20 +49,20 @@ class ClientSocket:
             print("\n" + server_message)
 
 
-
+# Testing
 if __name__ == "__main__":
     # Set up all necessary connections to the server
+    port = 5000
+
     necessary_connections = ["telemetry", "camera", "controls"]
-    client_list = [] 
 
     for conn in range(len(necessary_connections)):
-        client = ClientSocket(HOST, PORT+conn, necessary_connections[conn])
-        client_list.append(client)
+        client = ClientSocket(HOST, port+conn, necessary_connections[conn])
 
     # Testing sending a lot of message across threads
     while True:
         for client in client_list:
             print("Sending message from " + client.name)
-            client.send_message('Hello, server from port ' + str(PORT+necessary_connections.index(client.name)))
+            client.send_message('Hello, server from port ' + str(port+necessary_connections.index(client.name)))
 
 # End-of-file (EOF) 

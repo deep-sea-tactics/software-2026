@@ -72,11 +72,11 @@ class Controller:
 
 
             elif event.type == pygame.JOYAXISMOTION:
-                if abs(event.value) > 0.1:
+                if abs(event.value) > 0.1: #if joystick moved pasts the deadzone
                     print(f" {event.axis} {event.value}")
                     # Convert float to -1, 0, or 1
                     direction = 1 if event.value > 0 else -1
-                    input_key = (event.axis, direction)  # e.g. (1, 1)
+                    input_key = (event.axis, -direction)  # e.g. (1, 1)
                     action = self.find_action("Controller", input_key)
                     if action:
                         print(f"[Axis {event.axis} dir {direction}] -> '{action}' | value: {event.value:.2f}")
@@ -115,17 +115,20 @@ class Controller:
                     self.controller = None
             '''''''''''''''''''''''
 
-    def _read_gamepad(self, vec):
-        
+    #polls for inputs and check if it's connected to a movement action, if yes, change zero to 1 or -1 with respect to its index
+    def read_gamepad(self, vec): 
+        InvertedAxis = [1] 
         for axis in range(self.controller.get_numaxes()):
-            raw = self.controller.get_axis(axis)
+            raw = float(self.controller.get_axis(axis))
+            if axis in InvertedAxis:
+                raw *= -1
             if abs(raw) > 0.1:  # deadzone
                 direction = 1 if raw > 0 else -1
                 input_key = (axis, direction)
                 action = self.find_action("Controller", input_key)
                 if action and action in ACTION_TO_DOF:
                     dof, scale = ACTION_TO_DOF[action]
-                    vec[self.dof_to_index[dof]] += raw * scale
+                    vec[self.dof_to_index[dof]] += raw
 
         for btn in range(self.controller.get_numbuttons()):
             if self.controller.get_button(btn):
@@ -146,19 +149,20 @@ class Controller:
                         dof, scale = ACTION_TO_DOF[action]
                         vec[self.dof_to_index[dof]] += scale
 
-
-    def _read_keyboard(self, vec):
+    #polls for inputs and check if it's connected to a movement action, if yes, change zero to 1 or -1 with respect to its index
+    def read_keyboard(self, vec): 
         for key_name in self.keys_held:
             action = self.find_action("Keyboard", key_name)
             if action and action in ACTION_TO_DOF:
                 dof, scale = ACTION_TO_DOF[action]
                 vec[self.dof_to_index[dof]] += scale
     
+    
     def get_input_vector(self):
         vec = np.zeros(6)
         if self.controller:
-            self._read_gamepad(vec)
+            self.read_gamepad(vec)
         else:
-            self._read_keyboard(vec)
+            self.read_keyboard(vec)
         return np.clip(vec, -1.0, 1.0)    # Ensure values are between -1 and 1
     

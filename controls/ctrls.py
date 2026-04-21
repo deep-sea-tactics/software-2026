@@ -13,4 +13,4 @@ while running:
     ctrls.handle_events()
     vec = ctrls.get_input_vector()
     print(vec)  # For testing, print the input vector to see the values being generated when keys are pressed. This should show a 6-element array corresponding to the DOFs based on the key presses.
-    clock.tick(30)  # Limit to 30 frames per second
+    clock.tick(10)  # Limit to 30 frames per second

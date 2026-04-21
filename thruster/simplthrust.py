@@ -6,7 +6,7 @@ import numpy as np
 # Inputs: [Surge, Sway, Heave, Roll, Pitch, Yaw]
 # Outputs: [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 
-# Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters [28]
+# Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters
 s = 0.707 
 
 mixer = np.array([
@@ -20,12 +20,12 @@ mixer = np.array([
     [ 0,  0,   1,   1,  -1,  0]  # MBR
 ])
 
-
+#format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 
-esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
+esc_max = 1800  # Max pulse width for ESC (1900 microseconds)
 esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
 esc_neutral = 1500  # Neutral pulse width for ESC (1500 microseconds)
 
@@ -48,7 +48,8 @@ class ThrusterController:
         if max_value > 1:
             thruster_outputs/= max_value  # Normalize to keep within [-1, 1]
 
-        pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range
+        #change thruster outputs from [-1, 1] to [1100, 1900] microseconds for ESC control
+        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
     
         for i in range(self.num_thrusters):
             print(self.thruster_pins[i])

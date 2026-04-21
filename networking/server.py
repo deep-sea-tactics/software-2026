@@ -4,7 +4,6 @@ from threading import Thread
 
 # The server's static IP address 
 HOST = "192.168.0.1" 
-PORT = 5000 
 
 server_socket_list = [] # List of all server sockets objects
 listening_socks = [] # List of all listening sockets for select
@@ -19,6 +18,11 @@ class ServerSocket:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Get instance
         self.socket.bind((host, port)) # Bind host and port
         self.socket.listen(5) # Enables server to accept connections
+
+        # For later use with select
+        listening_socks.append(self.socket)
+        server_socket_list.append(self)
+        print("Server socket created on port " + str(port))
 
     def listen_for_client(self):
         """
@@ -64,23 +68,26 @@ def find_matching_ServerSocket_obj(socket):
     for server_socket in server_socket_list:
         if server_socket.socket == socket:
             return server_socket
+        
+def read_multiple_sockets():
+    '''Read from multiple sockets using select'''
+    try:
+        read_socks, write_socks, except_socks = select.select(listening_socks, [], [], 0.5)
+        print("read_socks: " + str(read_socks))
+    except:
+        print("ts broken brochacho")
+    
+    for sock in read_socks:
+        server_socket = find_matching_ServerSocket_obj(sock)
+        server_socket.listen_for_client()
 
+# Testing
 if __name__ == "__main__":
+    port = 5000 
     for i in range(3):
-        server_socket = ServerSocket(HOST, PORT+i)
-        listening_socks.append(server_socket.socket)
-        server_socket_list.append(server_socket)
-        print("Server socket created on port " + str(PORT+i))
+        server_socket = ServerSocket(HOST, port+i)
 
     while True:
-        try:
-            read_socks, write_socks, except_socks = select.select(listening_socks, [], [], 0.5)
-            print("read_socks: " + str(read_socks))
-        except:
-            print("ts broken brochacho")
-
-        for sock in read_socks:
-            server_socket = find_matching_ServerSocket_obj(sock)
-            server_socket.listen_for_client()
+        read_multiple_sockets()
 
 # End-of-file (EOF)

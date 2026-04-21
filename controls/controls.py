@@ -115,7 +115,8 @@ class Controller:
                     self.controller = None
             '''''''''''''''''''''''
 
-    def read_gamepad(self, vec):
+    #polls for inputs and check if it's connected to a movement action, if yes, change zero to 1 or -1 with respect to its index
+    def read_gamepad(self, vec): 
         
         for axis in range(self.controller.get_numaxes()):
             raw = self.controller.get_axis(axis)
@@ -146,13 +147,14 @@ class Controller:
                         dof, scale = ACTION_TO_DOF[action]
                         vec[self.dof_to_index[dof]] += scale
 
-
-    def read_keyboard(self, vec):
+    #polls for inputs and check if it's connected to a movement action, if yes, change zero to 1 or -1 with respect to its index
+    def read_keyboard(self, vec): 
         for key_name in self.keys_held:
             action = self.find_action("Keyboard", key_name)
             if action and action in ACTION_TO_DOF:
                 dof, scale = ACTION_TO_DOF[action]
                 vec[self.dof_to_index[dof]] += scale
+    
     
     def get_input_vector(self):
         vec = np.zeros(6)

@@ -25,7 +25,7 @@ thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 
-esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
+esc_max = 1800  # Max pulse width for ESC (1900 microseconds)
 esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
 esc_neutral = 1500  # Neutral pulse width for ESC (1500 microseconds)
 
@@ -48,7 +48,7 @@ class ThrusterController:
         if max_value > 1:
             thruster_outputs/= max_value  # Normalize to keep within [-1, 1]
 
-        pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range
+        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range
     
         for i in range(self.num_thrusters):
             print(self.thruster_pins[i])

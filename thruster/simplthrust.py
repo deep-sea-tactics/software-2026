@@ -49,7 +49,7 @@ class ThrusterController:
             thruster_outputs/= max_value  # Normalize to keep within [-1, 1]
 
         #change thruster outputs from [-1, 1] to [1100, 1900] microseconds for ESC control
-        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
+        pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
     
         for i in range(self.num_thrusters):
             print(self.thruster_pins[i])

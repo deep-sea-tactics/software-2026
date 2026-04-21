@@ -67,13 +67,3 @@ if __name__ == "__main__":
         # Full forward surge
         input_vector = [1, 0, 0, 0, 0, 0]  
         thrusterTest.set_thrusters(input_vector)
-        time.sleep(.5)
-        
-        # Full backward surge
-        input_vector = [-1, 0, 0, 0, 0, 0]  
-        thrusterTest.set_thrusters(input_vector)
-        time.sleep(.5)
-        
-        # Stop all thrusters
-        thrusterTest.stop_all()
-        time.sleep(2)

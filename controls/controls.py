@@ -117,7 +117,7 @@ class Controller:
 
     #polls for inputs and check if it's connected to a movement action, if yes, change zero to 1 or -1 with respect to its index
     def read_gamepad(self, vec): 
-        InvertedAxis = [1] 
+        InvertedAxis = [] 
         for axis in range(self.controller.get_numaxes()):
             raw = float(self.controller.get_axis(axis))
             if axis in InvertedAxis:

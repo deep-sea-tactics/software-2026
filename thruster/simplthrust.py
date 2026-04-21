@@ -20,7 +20,7 @@ mixer = np.array([
     [ 0,  0,   1,   1,  -1,  0]  # MBR
 ])
 
-
+#format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
@@ -48,7 +48,8 @@ class ThrusterController:
         if max_value > 1:
             thruster_outputs/= max_value  # Normalize to keep within [-1, 1]
 
-        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range
+        #change thruster outputs from [-1, 1] to [1100, 1900] microseconds for ESC control
+        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
     
         for i in range(self.num_thrusters):
             print(self.thruster_pins[i])

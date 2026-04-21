@@ -34,12 +34,13 @@ class Arm:
     def stop(self):
         pi.set_servo_pulsewidth(self.pin, arm_neutral_width)
 
-# Testing
-armTest = Arm(arm_signal_pin)
-while True:
-    armTest.open()
-    time.sleep(2)
-    armTest.stop()
-    time.sleep(2)
-    armTest.close()
-    time.sleep(2)
+if __name__ == "__main__":
+    # Testing
+    armTest = Arm(arm_signal_pin)
+    while True:
+        armTest.open()
+        time.sleep(2)
+        armTest.stop()
+        time.sleep(2)
+        armTest.close()
+        time.sleep(2)

@@ -65,21 +65,22 @@ def find_matching_ServerSocket_obj(socket):
         if server_socket.socket == socket:
             return server_socket
 
-for i in range(3):
-    server_socket = ServerSocket(HOST, PORT+i)
-    listening_socks.append(server_socket.socket)
-    server_socket_list.append(server_socket)
-    print("Server socket created on port " + str(PORT+i))
+if __name__ == "__main__":
+    for i in range(3):
+        server_socket = ServerSocket(HOST, PORT+i)
+        listening_socks.append(server_socket.socket)
+        server_socket_list.append(server_socket)
+        print("Server socket created on port " + str(PORT+i))
 
-while True:
-    try:
-        read_socks, write_socks, except_socks = select.select(listening_socks, [], [], 0.5)
-        print("read_socks: " + str(read_socks))
-    except:
-        print("ts broken brochacho")
+    while True:
+        try:
+            read_socks, write_socks, except_socks = select.select(listening_socks, [], [], 0.5)
+            print("read_socks: " + str(read_socks))
+        except:
+            print("ts broken brochacho")
 
-    for sock in read_socks:
-        server_socket = find_matching_ServerSocket_obj(sock)
-        server_socket.listen_for_client()
+        for sock in read_socks:
+            server_socket = find_matching_ServerSocket_obj(sock)
+            server_socket.listen_for_client()
 
 # End-of-file (EOF)

@@ -46,18 +46,21 @@ class ClientSocket:
                 os._exit(0)
             print("\n" + server_message)
 
-# Set up all necessary connections to the server
-necessary_connections = ["telemetry", "camera", "controls"]
-client_list = [] 
 
-for conn in range(len(necessary_connections)):
-    client = ClientSocket(HOST, PORT+conn, necessary_connections[conn])
-    client_list.append(client)
 
-# Testing sending a lot of message across threads
-while True:
-    for client in client_list:
-        print("Sending message from " + client.name)
-        client.send_message('Hello, server from port ' + str(PORT+necessary_connections.index(client.name)))
+if __name__ == "__main__":
+    # Set up all necessary connections to the server
+    necessary_connections = ["telemetry", "camera", "controls"]
+    client_list = [] 
+
+    for conn in range(len(necessary_connections)):
+        client = ClientSocket(HOST, PORT+conn, necessary_connections[conn])
+        client_list.append(client)
+
+    # Testing sending a lot of message across threads
+    while True:
+        for client in client_list:
+            print("Sending message from " + client.name)
+            client.send_message('Hello, server from port ' + str(PORT+necessary_connections.index(client.name)))
 
 # End-of-file (EOF) 

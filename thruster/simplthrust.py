@@ -59,19 +59,20 @@ class ThrusterController:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Set all thrusters to neutral to stop
 
 # Testing
-thrusterTest = ThrusterController(mixer, [6])
-while True:
-    print("testing thrusters...")
-    # Full forward surge
-    input_vector = [1, 0, 0, 0, 0, 0]  
-    thrusterTest.set_thrusters(input_vector)
-    time.sleep(2)
-    
-    # Full backward surge
-    input_vector = [-1, 0, 0, 0, 0, 0]  
-    thrusterTest.set_thrusters(input_vector)
-    time.sleep(2)
-    
-    # Stop all thrusters
-    thrusterTest.stop_all()
-    time.sleep(2)
+if __name__ == "__main__":
+    thrusterTest = ThrusterController(mixer, [6])
+    while True:
+        print("testing thrusters...")
+        # Full forward surge
+        input_vector = [1, 0, 0, 0, 0, 0]  
+        thrusterTest.set_thrusters(input_vector)
+        time.sleep(2)
+        
+        # Full backward surge
+        input_vector = [-1, 0, 0, 0, 0, 0]  
+        thrusterTest.set_thrusters(input_vector)
+        time.sleep(2)
+        
+        # Stop all thrusters
+        thrusterTest.stop_all()
+        time.sleep(2)

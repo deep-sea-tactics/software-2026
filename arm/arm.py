@@ -20,8 +20,8 @@ arm_open_width = 1400
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 class Arm:
-    def __init__(self, pin):
-        self.pin = pin 
+    def __init__(self):
+        self.pin = arm_signal_pin 
         pi.set_mode(self.pin, pigpio.OUTPUT) #listener
         pi.set_PWM_frequency(self.pin, 50) # Set frequency to 50Hz 
     
@@ -36,7 +36,7 @@ class Arm:
 
 if __name__ == "__main__":
     # Testing
-    armTest = Arm(arm_signal_pin)
+    armTest = Arm()
     while True:
         armTest.open()
         time.sleep(2)

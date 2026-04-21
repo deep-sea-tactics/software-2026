@@ -2,6 +2,7 @@ import pygame
 import copy #for deep copying the default config to avoid mutating it when creating new Controller instances
 import numpy as np
 from default_config import ACTION_TO_DOF
+from arm import Arm
 
 class Controller:
     def __init__(self, joystick, config_file = None, default_config = None):
@@ -30,9 +31,11 @@ class Controller:
             print("No joysticks connected. Using keyboard controls.")
             print("Keyboard controls enabled.")
             self.controller = None # Set controller to None to indicate we're using keyboard controls
+
+        # Create other classes (e.g. Arm)  
+        self.arm = Arm()
                 
     
-
     def find_action(self, input_type, input_key):
         # Search through the config for the given input type and key
         for action, bindings in self.config.get(input_type, {}).items(): # for action, bindings in self.config[input_type].items():
@@ -43,7 +46,15 @@ class Controller:
     def send_command(self, action, raw_value):
         # TODO: replace print with socket send to RPI
         print(f"[COMMAND] Action: '{action}' | Raw value: {raw_value}")
-    
+
+        # Handle non-directional movement commands
+        if action == "Arm Open":
+            print("[COMMAND] Opening arm...")
+            self.arm.open()
+        elif action == "Arm Close":
+            print("[COMMAND] Closing arm...")
+            self.arm.close()
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

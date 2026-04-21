@@ -1,9 +1,11 @@
 from controls import Controller
 import pygame
 from default_config import default_config
+from arm import Arm
 
 
 ctrls = Controller(0, default_config=default_config)
+arm = Arm()
 
 # Required for keyboard events to register
 

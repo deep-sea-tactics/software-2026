@@ -25,7 +25,7 @@ thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 
-esc_max = 1800  # Max pulse width for ESC (1900 microseconds)
+esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
 esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
 esc_neutral = 1500  # Neutral pulse width for ESC (1500 microseconds)
 
@@ -49,7 +49,7 @@ class ThrusterController:
             thruster_outputs/= max_value  # Normalize to keep within [-1, 1]
 
         #change thruster outputs from [-1, 1] to [1100, 1900] microseconds for ESC control
-        pwm = (thruster_outputs * 400 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
+        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
     
         for i in range(self.num_thrusters):
             print(self.thruster_pins[i])
@@ -60,12 +60,74 @@ class ThrusterController:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Set all thrusters to neutral to stop
 
 # Testing
+# 16, 17, 22, 25, 26, 27
+
+''' 
 if __name__ == "__main__":
-    thrusterTest = ThrusterController(mixer, [6])
-    for i in range(10):
-        print("testing thrusters...")
-        # Full forward surge
-        input_vector = [1, 0, 0, 0, 0, 0]  
-        thrusterTest.set_thrusters(input_vector)
-        time.sleep(1)
+    thrusterTest = ThrusterController(mixer, [17, 27, 22, 25, 26])  # Example GPIO pins for 8 thrusters/ESCs
+    print("testing thrusters...")
+    # Full forward surge
+    input_vector = [1, 0, 0, 0, 0, 0]  
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+
     thrusterTest.stop_all()
+'''
+
+from threading import Thread
+def thruster_16():
+    thrusterTest = ThrusterController(mixer, [16])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all()
+
+def thruster_17():
+    thrusterTest = ThrusterController(mixer, [17])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all()
+
+def thruster_22():
+    thrusterTest = ThrusterController(mixer, [22])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all()
+
+def thruster_25():
+    thrusterTest = ThrusterController(mixer, [25])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all()
+
+def thruster_26():
+    thrusterTest = ThrusterController(mixer, [26])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all() 
+
+def thruster_27():
+    thrusterTest = ThrusterController(mixer, [27])
+    input_vector = [1, 0, 0, 0, 0, 0]
+    thrusterTest.set_thrusters(input_vector)
+    time.sleep(1)
+    thrusterTest.stop_all()
+
+if __name__ == "__main__":
+    thread1 = Thread(target=thruster_16)
+    thread2 = Thread(target=thruster_17)
+    thread3 = Thread(target=thruster_22)
+    thread4 = Thread(target=thruster_25)
+    thread5 = Thread(target=thruster_26)
+    thread6 = Thread(target=thruster_27)
+    thread1.start()
+    thread2.start()
+    thread3.start()
+    thread4.start()
+    thread5.start()
+    thread6.start()
+

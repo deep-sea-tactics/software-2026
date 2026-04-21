@@ -62,22 +62,10 @@ class ThrusterController:
 # Testing
 if __name__ == "__main__":
     thrusterTest = ThrusterController(mixer, [6])
-    while True:
+    for i in range(10):
         print("testing thrusters...")
         # Full forward surge
         input_vector = [1, 0, 0, 0, 0, 0]  
         thrusterTest.set_thrusters(input_vector)
-        time.sleep(2)
-        
-        # Stop all thrusters
-        thrusterTest.stop_all()
-        time.sleep(2)
-
-        # Full backward surge
-        input_vector = [-1, 0, 0, 0, 0, 0]  
-        thrusterTest.set_thrusters(input_vector)
-        time.sleep(2)
-        
-        # Stop all thrusters
-        thrusterTest.stop_all()
-        time.sleep(2)
+        time.sleep(1)
+    thrusterTest.stop_all()

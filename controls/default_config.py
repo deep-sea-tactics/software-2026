@@ -41,7 +41,6 @@ default_config = {
         "Roll Right":                   ["k", None],
         "Arm Open":                     ["f", None],
         "Arm Close":                    ["v", None],
-        "Stop All":                     ["q", None],
         "Take Photo":                   ["return", None],
     }
 }

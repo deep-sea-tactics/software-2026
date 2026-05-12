@@ -1,3 +1,5 @@
+#This file is for testing only.
+#Use main.py to run the actual program. copy the code below to main.py and fine tune as necessary.
 from controls import Controller
 import pygame
 from default_config import default_config

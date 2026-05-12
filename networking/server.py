@@ -55,6 +55,11 @@ class ServerSocket:
             # Print for debugging purposes
             print(str(cli_msg))
 
+
+    def send_message(self, receipent_id, message):
+        '''Send a message to one client'''
+        
+
     def broadcast_message(self, sender_id, message):
         '''Broadcast a message to all clients (testing purposes)'''
         for cli in self.client_list:

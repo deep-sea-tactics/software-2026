@@ -17,7 +17,10 @@ arm_neutral_width = 1500
 arm_open_width = 1400
 
 # Intialize pigpio
-pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
+try:
+    pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
+except:
+    print("Failed to connect to pigpio daemon")
 
 class Arm:
     def __init__(self):
@@ -26,9 +29,11 @@ class Arm:
         pi.set_PWM_frequency(self.pin, 50) # Set frequency to 50Hz 
     
     def close(self):
+        print("closing arm")
         pi.set_servo_pulsewidth(self.pin, arm_close_width)
 
     def open(self):
+        print("opening arm")
         pi.set_servo_pulsewidth(self.pin, arm_open_width)
     
     def stop(self):

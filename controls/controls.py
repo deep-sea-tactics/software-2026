@@ -1,7 +1,10 @@
 import pygame
 import copy #for deep copying the default config to avoid mutating it when creating new Controller instances
 import numpy as np
-from default_config import ACTION_TO_DOF
+try:
+    from default_config import ACTION_TO_DOF
+except ImportError:
+    print("Default config could not be found")
 
 class Controller:
     def __init__(self, joystick, config_file = None, default_config = None):
@@ -11,12 +14,15 @@ class Controller:
         pygame.display.iconify()    # immediately minimizes it
         self.dof_to_index = {"surge": 0, "sway": 1, "heave": 2, "roll": 3, "pitch": 4, "yaw": 5}  
         self.keys_held = set()  # Track currently held keys for repeat handling
+        self.action_function_map = {} # Map actions to their corresponding functions 
 
+        # Load configuration for input bindings
         if config_file is None:
             self.config = copy.deepcopy(default_config)
         else:
             self.config = copy.deepcopy(config_file) # Load config from file if provided, otherwise use default
 
+        # Establishes joystick details if available
         joystick_count = pygame.joystick.get_count()
         if joystick_count > 0:
             self.controller = pygame.joystick.Joystick(joystick)
@@ -25,31 +31,44 @@ class Controller:
             num_axis = self.controller.get_numaxes()
             num_buttons = self.controller.get_numbuttons()
             print(f"Joystick Name: {self.controller.get_name()}, Number of hats: {num_hats}, Number of axes: {num_axis}, Number of buttons: {num_buttons}")
-
         else: 
             print("No joysticks connected. Using keyboard controls.")
             print("Keyboard controls enabled.")
             self.controller = None # Set controller to None to indicate we're using keyboard controls
-
-                
+      
     
     def find_action(self, input_type, input_key):
-        # Search through the config for the given input type and key
-        for action, bindings in self.config.get(input_type, {}).items(): # for action, bindings in self.config[input_type].items():
+    # Search through the config for the given input type then input key to find the corresponding action
+        for action, bindings in self.config.get(input_type, {}).items(): 
             if input_key in bindings:
                 return action
         return None
-    
+
+    def bind_action_to_function(self, action, func):
+        # Binds a function to a specific action
+        print(type(self.action_function_map))
+        self.action_function_map[action] = func
+
     def send_command(self, action, raw_value):
         # TODO: replace print with socket send to RPI
         print(f"[COMMAND] Action: '{action}' | Raw value: {raw_value}")
 
+        # Attempt to call the bound function for this action 
+        try:
+            self.action_function_map[action]()
+        except KeyError:
+            print(f"Function not bound to action: '{action}'")
+
     def handle_events(self):
+    # Handle all pygame events (joystick and keyboard) and send corresponding commands
         for event in pygame.event.get():
+            
+            # Handle quit event
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
 
+            # Handle joystick button events
             elif event.type == pygame.JOYBUTTONDOWN:
                 print(f" {event.button}")
                 action = self.find_action("Controller", event.button)
@@ -59,7 +78,7 @@ class Controller:
                 else:
                     print(f"[Button {event.button}] -> No binding found")
 
-
+            # Handle joystick hat events
             elif event.type == pygame.JOYHATMOTION:
                 print(f" {event.hat} {event.value}")
                 input_key = (event.hat, event.value)   # e.g. (0, (0, 1))
@@ -70,7 +89,7 @@ class Controller:
                 else:
                     print(f"[Hat {event.hat} {event.value}] -> No binding found")
 
-
+            # handle joystick axis events with a deadzone threshold to prevent drift
             elif event.type == pygame.JOYAXISMOTION:
                 if abs(event.value) > 0.1: #if joystick moved pasts the deadzone
                     print(f" {event.axis} {event.value}")
@@ -78,17 +97,20 @@ class Controller:
                     direction = 1 if event.value > 0 else -1
                     input_key = (event.axis, -direction)  # e.g. (1, 1)
                     action = self.find_action("Controller", input_key)
+                    
                     if action:
                         print(f"[Axis {event.axis} dir {direction}] -> '{action}' | value: {event.value:.2f}")
                         self.send_command(action, event.value)
                     else:
                         print(f"[Axis {event.axis} dir {direction}] -> No binding found")
             
-
+            # handle KEYBOARD key events with key repeat enabled for held keys
             elif event.type == pygame.KEYDOWN:
                 self.keys_held.add(pygame.key.name(event.key))
                 pygame.key.set_repeat(200, 50) # Enable key repeat with a delay of 200ms and interval of 50ms
+                
                 if event.key == pygame.K_ESCAPE:
+                    # escape key to quit the program
                     pygame.quit()
                     exit()
                     

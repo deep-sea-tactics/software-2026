@@ -57,7 +57,7 @@ class SingleThruster:
 
     def stop(self):
          # Set thruster to neutral to stop
-         for pin in self.thruster_pins:
+         for pin in range(len(self.thruster_pins)):
             pi.set_servo_pulsewidth(self.thruster_pins, esc_neutral)
 
 class ThrusterSystem:

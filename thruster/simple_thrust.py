@@ -49,22 +49,11 @@ class SingleThruster:
     
         # Change thruster outputs from [-1, 1] to [1200, 1800] microseconds for ESC control
         pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
+        pwm = np.clip(pwm, esc_min, esc_max)  # Ensure PWM values are within ESC limits
         
-       
-        #pi.set_servo_pulsewidth(self.thruster_pins, pwm)  # Send PWM signal to thruster
-
-    def move_thruster(pin, pwm):
-        pi.set_servo_pulsewidth(pin, pwm)  # Send PWM signal to thruster
-    
-    def thruster_thread(self, pin, pwm):
-        threads = []
         for pin in range(len(self.thruster_pins)):
-            thread = Thread(target=self.move_thruster, args=(self.thruster_pins[pin], pwm[pin]))
-            threads.append(thread)
-            thread.start()
-        
-        for thread in threads:
-            thread.join()  # Wait for all threads to finish
+            pi.set_servo_pulsewidth(self.thruster_pins, pwm)  # Send PWM signal to thruster
+            time.sleep(0.00005)  # Small delay to ensure signal is sent properly
 
     def stop(self):
          # Set thruster to neutral to stop

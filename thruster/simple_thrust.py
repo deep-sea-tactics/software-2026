@@ -31,9 +31,9 @@ esc_neutral = 1500  # Neutral pulse width for ESC (1500 microseconds)
 
 class SingleThruster:
     '''Class to control a single thruster using the mixer and a specific GPIO pin'''
-    def __init__(self, mixer, thruster_pin):
+    def __init__(self, mixer, thruster_pins):
         self.mixer = mixer
-        self.thruster_pin = thruster_pin
+        self.thruster_pins = thruster_pins
         
         for pin in thruster_pins:
             pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
@@ -46,15 +46,30 @@ class SingleThruster:
         max_value = np.max(np.abs(thruster_outputs))
         if max_value > 1:
             thruster_outputs /= max_value  # Normalize to keep within [-1, 1]
-
-        # Change thruster outputs from [-1, 1] to [1100, 1900] microseconds for ESC control
+    
+        # Change thruster outputs from [-1, 1] to [1200, 1800] microseconds for ESC control
         pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
+        
+       
+        #pi.set_servo_pulsewidth(self.thruster_pins, pwm)  # Send PWM signal to thruster
+
+    def move_thruster(pin, pwm):
+        pi.set_servo_pulsewidth(pin, pwm)  # Send PWM signal to thruster
     
-        pi.set_servo_pulsewidth(self.thruster_pin, pwm)  # Send PWM signal to thruster
-    
+    def thruster_thread(self, pin, pwm):
+        threads = []
+        for pin in range(len(self.thruster_pins)):
+            thread = Thread(target=self.move_thruster, args=(self.thruster_pins[pin], pwm[pin]))
+            threads.append(thread)
+            thread.start()
+        
+        for thread in threads:
+            thread.join()  # Wait for all threads to finish
+
     def stop(self):
          # Set thruster to neutral to stop
-        pi.set_servo_pulsewidth(self.thruster_pin, esc_neutral)
+         for pin in self.thruster_pins:
+            pi.set_servo_pulsewidth(self.thruster_pins, esc_neutral)
 
 class ThrusterSystem:
     '''Class to manage multiple thrusters with multithreading'''

@@ -44,7 +44,7 @@ def generate_frames():
         stream.truncate()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='192.168.0.2', port=5001)
 
 # Endpoint: http://192.168.0.2:5001/video_feed
 

@@ -8,21 +8,22 @@ from threading import Thread
 # Outputs: [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 
 # Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters
-s = 0.707 
+S = 0.707 
+AMPERAGE_LIMIT = 25 # Max amperage for thrusters
 
 mixer = np.array([
-    [ s,  s,   0,   0,   0,  1], # FL
-    [-s,  s,   0,   0,   0, -1], # FR
-    [-s, -s,   0,   0,   0,  1], # BL
-    [ s, -s,   0,   0,   0, -1], # BR
+    [ S,  S,   0,   0,   0,  1], # FL
+    [-S,  S,   0,   0,   0, -1], # FR
+    [-S, -S,   0,   0,   0,  1], # BL
+    [ S, -S,   0,   0,   0, -1], # BR
     [ 0,  0,   1,  -1,   1,  0], # MFL
     [ 0,  0,   1,   1,   1,  0], # MFR
     [ 0,  0,   1,  -1,  -1,  0], # MBL
     [ 0,  0,   1,   1,  -1,  0]  # MBR
 ])
-
 #format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
-thruster_pins = [1,2,3,4,5,6,7,8]  # Example GPIO pins for 8 thrusters/ESCs
+
+thruster_pins = []  # Example GPIO pins for 8 thrusters/ESCs
 pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
 esc_max = 1900  # Max pulse width for ESC (1900 microseconds)

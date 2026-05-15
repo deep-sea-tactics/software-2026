@@ -8,40 +8,41 @@ networking systems.
 import pigpio
 import time
 
-# Configure as necessary
-arm_signal_pin = 23
-
 # Establish the necessary PWM signal widths/durations (in microseconds)
-arm_close_width = 1600
-arm_neutral_width = 1500
-arm_open_width = 1400
-
-# Intialize pigpio
-try:
-    pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
-except:
-    print("Failed to connect to pigpio daemon")
+ARM_CLOSE_WIDTH = 1600
+ARM_NEUTRAL_WIDTH = 1500
+ARM_OPEN_WIDTH = 1400
 
 class Arm:
-    def __init__(self):
+    def __init__(self, pigpio_ip, pigpio_port, arm_signal_pin):
+        # Intialize pigpio
+        try: 
+            self.pi = pigpio.pi(pigpio_ip, pigpio_port)
+        except:
+            print("Failed to connect to pigpio daemon")
+        
+        # Initalize arm
         self.pin = arm_signal_pin 
-        pi.set_mode(self.pin, pigpio.OUTPUT) #listener
-        pi.set_PWM_frequency(self.pin, 50) # Set frequency to 50Hz 
+        self.pi.set_mode(self.pin, pigpio.OUTPUT) #listener
+        self.pi.set_PWM_frequency(self.pin, 50) # Set frequency to 50Hz 
     
+    # Sends PWM signals to close arm
     def close(self):
         print("closing arm")
-        pi.set_servo_pulsewidth(self.pin, arm_close_width)
+        self.pi.set_servo_pulsewidth(self.pin, ARM_CLOSE_WIDTH)
 
+    # Sends PWM signals to open arm
     def open(self):
         print("opening arm")
-        pi.set_servo_pulsewidth(self.pin, arm_open_width)
-    
+        self.pi.set_servo_pulsewidth(self.pin, ARM_OPEN_WIDTH)
+
+    # Neutral signal
     def stop(self):
-        pi.set_servo_pulsewidth(self.pin, arm_neutral_width)
+        self.pi.set_servo_pulsewidth(self.pin, ARM_NEUTRAL_WIDTH)
 
 if __name__ == "__main__":
     # Testing
-    armTest = Arm()
+    armTest = Arm("192.168.0.2", 8888)
     while True:
         armTest.open()
         time.sleep(2)

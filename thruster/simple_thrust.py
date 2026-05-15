@@ -9,7 +9,11 @@ from threading import Thread
 
 # Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters
 S = 0.707 
+ESC_MAX = 1900  # Max pulse width for ESC (1900 microseconds)
+ESC_MIN = 1100  # Min pulse width for ESC (1100 microseconds)
+ESC_NEUTRAL = 1500  # Neutral pulse width for ESC (1500 microseconds)
 AMPERAGE_LIMIT = 25 # Max amperage for thrusters
+amperage_limit_per_unit = 10 # Set during initialization 
 
 mixer = np.array([
     [ S,  S,   0,   0,   0,  1], # FL
@@ -24,21 +28,24 @@ mixer = np.array([
 #format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 
 thruster_pins = []  # Example GPIO pins for 8 thrusters/ESCs
-pi = pigpio.pi("192.168.0.2", 8888) # Connect to pigpio daemon
 
-esc_max = 1900  # Max pulse width for ESC (1900 microseconds)
-esc_min = 1100  # Min pulse width for ESC (1100 microseconds)
-esc_neutral = 1500  # Neutral pulse width for ESC (1500 microseconds)
+class Thruster:
+    '''Class to control thrusters using the mixer and GPIO pins'''
+    def __init__(self, pigpio_ip, pigpio_port, mixer, thruster_pins):
+        # intialize pigpio
+        try: 
+            self.pi = pigpio.pi(pigpio_ip, pigpio_port)
+        except:
+            print("Failed to connect to pigpio daemon")
 
-class SingleThruster:
-    '''Class to control a single thruster using the mixer and a specific GPIO pin'''
-    def __init__(self, mixer, thruster_pins):
+        # Initialize thruster systems
         self.mixer = mixer
         self.thruster_pins = thruster_pins
+        self.amperage_limit_per_unit = AMPERAGE_LIMIT / thruster_pins.__len__() # Amperage limit per thruster
         
         for pin in thruster_pins:
-            pi.set_servo_pulsewidth(pin, esc_neutral)  # Initialize all thrusters to neutral (arming)
-            pi.set_PWM_frequency(pin, 50) # Set frequency to 50Hz
+            self.pi.set_servo_pulsewidth(pin, ESC_NEUTRAL)  # Initialize all thrusters to neutral (arming)
+            self.pi.set_PWM_frequency(pin, 50) # Set frequency to 50Hz
 
     def set_thruster(self, input):
         # Input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
@@ -49,17 +56,17 @@ class SingleThruster:
             thruster_outputs /= max_value  # Normalize to keep within [-1, 1]
     
         # Change thruster outputs from [-1, 1] to [1200, 1800] microseconds for ESC control
-        pwm = (thruster_outputs * 300 + esc_neutral).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
-        pwm = np.clip(pwm, esc_min, esc_max)  # Ensure PWM values are within ESC limits
+        pwm = (thruster_outputs * 300 + ESC_NEUTRAL).astype(int)  # Scale to ESC pulse width range (1100-1900 microseconds)
+        pwm = np.clip(pwm, ESC_MIN, ESC_MAX)  # Ensure PWM values are within ESC limits
         
         for pin in range(len(self.thruster_pins)):
-            pi.set_servo_pulsewidth(self.thruster_pins[pin], pwm[pin])  # Send PWM signal to thruster
+            self.pi.set_servo_pulsewidth(self.thruster_pins[pin], pwm[pin])  # Send PWM signal to thruster
             time.sleep(0.00005)  # Small delay to ensure signal is sent properly
 
     def stop(self):
          # Set thruster to neutral to stop
          for pin in range(len(self.thruster_pins)):
-            pi.set_servo_pulsewidth(self.thruster_pins[pin], esc_neutral)
+            pi.set_servo_pulsewidth(self.thruster_pins[pin], ESC_NEUTRAL)
 
 '''
 class ThrusterSystem:
@@ -87,7 +94,7 @@ class ThrusterSystem:
 '''
 
 if __name__ == "__main__":
-    thrustsys = SingleThruster(mixer, [16, 17, 22, 25, 26, 27])
+    thrustsys = Thruster(mixer, [16, 17, 22, 25, 26, 27])
     thrustsys.set_thruster([1, 0, 0, 0, 0, 0])  # Example input vector for surge forward
     time.sleep(5)
     thrustsys.stop()

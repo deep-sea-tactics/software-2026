@@ -3,10 +3,18 @@ USE X11 Forwarding in case this fails
 - Open and run Xming server w/ Xlaunch
 - Enable X11 forwarding in the SSH client (Putty) settings
 - Run rpicam-hello -t 0 on the RPI; window pops up on local machine
-rpi-vid is also usuable IF this is the Linux native laptop
-'''
 
-''' This is ran on the RPI!!! '''
+rpi-vid is also viable
+- On the RPI:
+    - rpicam-vid -t 0 -n --inline --listen -o tcp://0.0.0.0:<port>
+- On the local machine, will require both ffplay (FFmpeg) and vlc to be installed:
+    - ffplay tcp://192.168.0.2:<port> -vf "setpts=N/30" -fflags nobuffer -flags low_delay -framedrop
+    - vlc tcp://192.168.0.2:<port>
+
+The following uses a Flask solution to stream the video feed from the RPI to the local machine.
+It requires the least setup up on the local machine as all the libraries are installed on the RPI
+This file is ran on the RPI to establish the Flask server
+'''
 
 import io
 import cv2
@@ -35,7 +43,10 @@ def generate_frames():
         stream.seek(0)
         stream.truncate()
 
-# Endpoint: http://192.168.0.2:5000/video_feed
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5001)
+
+# Endpoint: http://192.168.0.2:5001/video_feed
 
 '''''''''''''''
 cap = cv2.VideoCapture(0) # change this based on ip address of camera feed (ie. 0 for local webcam, or for rpi cam feed, use the ip address of the rpi followed by the port number)

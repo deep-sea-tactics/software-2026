@@ -2,7 +2,7 @@ import pygame
 import copy #for deep copying the default config to avoid mutating it when creating new Controller instances
 import numpy as np
 try:
-    from default_config import ACTION_TO_DOF
+    from .default_config import ACTION_TO_DOF
 except ImportError:
     print("Default config could not be found")
 

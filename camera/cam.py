@@ -45,14 +45,15 @@ class Camera:
 
 
 
-cam = Camera(0)
-while True:
-    
-    cam.get_frame()
-    
-    if cv2.waitKey(1) == ord('q'):
-        cam.release()
-        break
+if __name__ == "__main__":
+    cam = Camera()
+    while True:
+        
+        cam.get_frame()
+        
+        if cv2.waitKey(1) == ord('q'):
+            cam.release()
+            break
 
 
 

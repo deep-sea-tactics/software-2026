@@ -1,7 +1,10 @@
 from controls.default_config import ACTION_TO_DOF
 from controls.default_config import default_config
 from controls.controls import Controller
+from camera.cam import Camera
 from arm.arm import Arm
+#from thruster.simple_thrust import ThrusterSystem
+from thruster.simple_thrust import SingleThruster
 
 import pygame
 
@@ -10,9 +13,12 @@ clock = pygame.time.Clock()  # Create a clock object to manage the frame rate
 running = True
 
 ArmObj = Arm()
+CameraObj = Camera(0)
+ThrusterSysObj = SingleThruster(None, [16, 17, 22, 25, 26, 27])  # Use default mixer
 
-ctrls.bind_action_to_function("Arm Open", lambda: ArmObj.open(ArmObj))
-ctrls.bind_action_to_function("Arm Close", lambda: ArmObj.close(ArmObj))
+ctrls.bind_action_to_function("Arm Open", lambda: ArmObj.open())
+ctrls.bind_action_to_function("Arm Close", lambda: ArmObj.close())
+ctrls.bind_action_to_function("Take Photo", lambda: CameraObj.get_frame())
 
 while running:
     print("handling events")

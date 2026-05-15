@@ -52,16 +52,17 @@ class SingleThruster:
         pwm = np.clip(pwm, esc_min, esc_max)  # Ensure PWM values are within ESC limits
         
         for pin in range(len(self.thruster_pins)):
-            pi.set_servo_pulsewidth(self.thruster_pins, pwm)  # Send PWM signal to thruster
+            pi.set_servo_pulsewidth(self.thruster_pins[pin], pwm[pin])  # Send PWM signal to thruster
             time.sleep(0.00005)  # Small delay to ensure signal is sent properly
 
     def stop(self):
          # Set thruster to neutral to stop
          for pin in range(len(self.thruster_pins)):
-            pi.set_servo_pulsewidth(self.thruster_pins, esc_neutral)
+            pi.set_servo_pulsewidth(self.thruster_pins[pin], esc_neutral)
 
+'''
 class ThrusterSystem:
-    '''Class to manage multiple thrusters with multithreading'''
+    # Class to manage multiple thrusters with multithreading
    
     def __init__(self, mixer, thruster_pins):
     # Defines list of SingleThruster objects
@@ -82,9 +83,11 @@ class ThrusterSystem:
     # Stops all thrusters 
         for thruster in self.thrusters:
             thruster.stop()
+'''
 
 if __name__ == "__main__":
-    thrustsys = ThrusterSystem(mixer, [16, 17, 22, 25, 26, 27])
-    thrustsys.set_thrusters([0.5, 0, 0, 0, 0, 0])  # Example input vector for surge forward
+    thrustsys = SingleThruster(mixer, [16, 17, 22, 25, 26, 27])
+    thrustsys.set_thruster([1, 0, 0, 0, 0, 0])  # Example input vector for surge forward
     time.sleep(5)
-    thrustsys.stop_all()
+    thrustsys.stop()
+    print("Thrusters stopped successfully.")

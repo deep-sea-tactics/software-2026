@@ -9,8 +9,10 @@ from threading import Thread
 
 # Angle factor 0.7 is 1/sqrt(2) for 45-degree vectored thrusters
 S = 0.707 
-ESC_MAX = 1900  # Max pulse width for ESC (1900 microseconds)
-ESC_MIN = 1100  # Min pulse width for ESC (1100 microseconds)
+
+# Very brute force impelmentation of amperage limits (according to T200 docs, max amperage is ~23A at full throttle)
+ESC_MAX = 1712  # Max pulse width for ESC (1900 microseconds)
+ESC_MIN = 1288  # Min pulse width for ESC (1100 microseconds)
 ESC_NEUTRAL = 1500  # Neutral pulse width for ESC (1500 microseconds)
 AMPERAGE_LIMIT = 25 # Max amperage for thrusters
 amperage_limit_per_unit = 10 # Set during initialization 
@@ -66,7 +68,7 @@ class Thruster:
     def stop(self):
          # Set thruster to neutral to stop
          for pin in range(len(self.thruster_pins)):
-            pi.set_servo_pulsewidth(self.thruster_pins[pin], ESC_NEUTRAL)
+            self.pi.set_servo_pulsewidth(self.thruster_pins[pin], ESC_NEUTRAL)
 
 '''
 class ThrusterSystem:

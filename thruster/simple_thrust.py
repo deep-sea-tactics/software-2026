@@ -50,8 +50,10 @@ class Thruster:
             self.pi.set_PWM_frequency(pin, 50) # Set frequency to 50Hz
 
     def set_thruster(self, input):
-        # Input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
-        # Comes from get_input_vector() func in controls.py, which will be called in the main loop of the program.
+        '''
+        Input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
+        Comes from get_input_vector() func in controls.py, which will be called in the main loop of the program.
+        '''
         thruster_outputs = np.matmul(self.mixer, input)  # Matrix multiplication to get thruster outputs
         max_value = np.max(np.abs(thruster_outputs))
         if max_value > 1:
@@ -66,9 +68,17 @@ class Thruster:
             time.sleep(0.00005)  # Small delay to ensure signal is sent properly
 
     def stop(self):
-         # Set thruster to neutral to stop
+         '''Set thruster to neutral to stop'''
          for pin in range(len(self.thruster_pins)):
             self.pi.set_servo_pulsewidth(self.thruster_pins[pin], ESC_NEUTRAL)
+
+if __name__ == "__main__":
+    thrustsys = Thruster(mixer, [16, 17, 22, 25, 26, 27])
+    thrustsys.set_thruster([1, 0, 0, 0, 0, 0])  # Example input vector for surge forward
+    time.sleep(5)
+    thrustsys.stop()
+    print("Thrusters stopped successfully.")
+
 
 '''
 class ThrusterSystem:
@@ -94,10 +104,3 @@ class ThrusterSystem:
         for thruster in self.thrusters:
             thruster.stop()
 '''
-
-if __name__ == "__main__":
-    thrustsys = Thruster(mixer, [16, 17, 22, 25, 26, 27])
-    thrustsys.set_thruster([1, 0, 0, 0, 0, 0])  # Example input vector for surge forward
-    time.sleep(5)
-    thrustsys.stop()
-    print("Thrusters stopped successfully.")

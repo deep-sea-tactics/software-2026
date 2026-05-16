@@ -24,8 +24,8 @@ mixer = np.array([
     [ S, -S,   0,   0,   0, -1], # BR
     [ 0,  0,   1,  -1,   1,  0], # MFL
     [ 0,  0,   1,   1,   1,  0], # MFR
-    [ 0,  0,   1,  -1,  -1,  0], # MBL
-    [ 0,  0,   1,   1,  -1,  0]  # MBR
+    #[ 0,  0,   1,  -1,  -1,  0], # MBL
+    #[ 0,  0,   1,   1,  -1,  0]  # MBR
 ])
 #format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 

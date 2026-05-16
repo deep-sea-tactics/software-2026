@@ -15,9 +15,54 @@ The following uses a Flask solution to stream the video feed from the RPI to the
 It requires the least setup up on the local machine as all the libraries are installed on the RPI
 This file is ran on the RPI to establish the Flask server
 '''
-
 import io
 import cv2
+
+cap = cv2.VideoCapture(0) # change this based on ip address of camera feed (ie. 0 for local webcam, or for rpi cam feed, use the ip address of the rpi followed by the port number)
+
+class Camera:
+    '''Controls general camera functions'''
+    def __init__(self, source):
+        self.cap = cv2.VideoCapture(source)
+
+    def get_frame(self):
+        '''Get and display a video frame'''
+        ret, frame = self.cap.read()
+
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            return None
+        
+        cv2.imshow('ROV CAM FEED', frame)
+
+    def release(self):
+        '''Close windows'''
+        self.cap.release()
+        cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    cam = Camera(0)
+    while True:
+        key = cv2.waitKey(1)
+        ret, frame = cam.cap.read()
+
+        cam.get_frame()
+        
+        if key == ord('s'):
+            # Save to file
+            cv2.imwrite('frozen_pic.jpg', frame)
+            # Show in a separate window to "freeze" it on screen
+            cv2.imshow('Frozen Frame', frame)
+            print("Frame captured and frozen!")
+
+        if key == ord('q'):
+            cam.release()
+            break
+        
+
+''' 
+Unused Flask Solution
 # These two directories should be donwnloaded on the RPI, but are not necessary for the local machine
 import picamera2
 from flask import Flask, Response
@@ -47,59 +92,7 @@ if __name__ == "__main__":
     app.run(host='192.168.0.2', port=5001)
 
 # Endpoint: http://192.168.0.2:5001/video_feed
-
-'''''''''''''''
-cap = cv2.VideoCapture(0) # change this based on ip address of camera feed (ie. 0 for local webcam, or for rpi cam feed, use the ip address of the rpi followed by the port number)
-
-if not cap.isOpened():
-    print("Cannot open camera")
-    exit()
-
-while True:
-    ret, frame = cap.read()
-
-    if not ret:
-        print("Can't receive frame (stream end?). Exiting ...")
-        break
-
-    cv2.imshow('ROV CAM FEED', frame)
-    if cv2.waitKey(1) == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-
-class Camera:
-    def __init__(self, source):
-        self.cap = cv2.VideoCapture(source)
-    
-
-    def get_frame(self):
-        ret, frame = self.cap.read()
-
-        if not ret:
-            print("Can't receive frame (stream end?). Exiting ...")
-            return None
-        
-        cv2.imshow('ROV CAM FEED', frame)
-        
-
-    def release(self):
-        self.cap.release()
-        cv2.destroyAllWindows()
-
-
-if __name__ == "__main__":
-    cam = Camera(0)
-    while True:
-        
-        cam.get_frame()
-        
-        if cv2.waitKey(1) == ord('q'):
-            cam.release()
-            break
-'''''''''
-
+'''
 
 
 

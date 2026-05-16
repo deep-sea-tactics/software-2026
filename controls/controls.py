@@ -8,6 +8,7 @@ except ImportError:
 
 class Controller:
     def __init__(self, joystick, config_file = None, default_config = None):
+        # Initialize pygame and joystick
         pygame.init()
         pygame.joystick.init()
         screen = pygame.display.set_mode((1, 1))  # 1x1 pixel, basically invisible
@@ -50,7 +51,6 @@ class Controller:
         self.action_function_map[action] = func
 
     def send_command(self, action, raw_value):
-        # TODO: replace print with socket send to RPI
         print(f"[COMMAND] Action: '{action}' | Raw value: {raw_value}")
 
         # Attempt to call the bound function for this action 

@@ -1,10 +1,3 @@
-'''
-The arm isn't too important a feature but it appears
-to be pretty simple to test. So, we can use the arm
-to test the general capability of both the input and
-networking systems. 
-'''
-
 import pigpio
 import time
 
@@ -14,6 +7,8 @@ ARM_NEUTRAL_WIDTH = 1500
 ARM_OPEN_WIDTH = 1400
 
 class Arm:
+    """Create and manage arm"""
+
     def __init__(self, pigpio_ip, pigpio_port, arm_signal_pin):
         # Intialize pigpio
         try: 
@@ -26,18 +21,18 @@ class Arm:
         self.pi.set_mode(self.pin, pigpio.OUTPUT) #listener
         self.pi.set_PWM_frequency(self.pin, 50) # Set frequency to 50Hz 
     
-    # Sends PWM signals to close arm
     def close(self):
-        print("closing arm")
+        '''Sends PWM signals to close arm'''
         self.pi.set_servo_pulsewidth(self.pin, ARM_CLOSE_WIDTH)
 
-    # Sends PWM signals to open arm
     def open(self):
+        '''Sends PWM signals to open arm'''
         print("opening arm")
         self.pi.set_servo_pulsewidth(self.pin, ARM_OPEN_WIDTH)
 
     # Neutral signal
     def stop(self):
+        '''Neutral signal'''
         self.pi.set_servo_pulsewidth(self.pin, ARM_NEUTRAL_WIDTH)
 
 if __name__ == "__main__":

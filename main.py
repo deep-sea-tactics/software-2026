@@ -1,14 +1,14 @@
 import pygame
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from controls.default_config import ACTION_TO_DOF
 from controls.default_config import default_config
 from controls.controls import Controller
 from arm.arm import Arm
-from thruster.simple_thrust import Thruster
+from thruster.simple_thrust import Thruster, mixer
 
 # IP and port information
 PIGPIO_IP = "192.168.0.2"
-PIGPIO_PORT_LIST = [5000, 5001, 5002]  
+PIGPIO_PORT_LIST = 8888
 
 # Running 
 clock = pygame.time.Clock()  
@@ -16,8 +16,8 @@ running = True
 
 # Object initialization
 ctrls = Controller(0, default_config=default_config)
-ArmObj = Arm(PIGPIO_IP, PIGPIO_PORT_LIST[0], 23)
-ThrusterObj = Thruster(PIGPIO_IP, PIGPIO_PORT_LIST[1], None, [16, 17, 22, 25, 26, 27])  # Use default mixer
+ArmObj = Arm(PIGPIO_IP, PIGPIO_PORT_LIST, 23)
+ThrusterObj = Thruster(PIGPIO_IP, PIGPIO_PORT_LIST, mixer, [16,17,27,22,25,26])  # Use default mixer
 
 # Binding action inputs to functions
 ctrls.bind_action_to_function("Arm Open", lambda: ArmObj.open())

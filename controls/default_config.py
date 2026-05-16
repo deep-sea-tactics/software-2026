@@ -22,7 +22,7 @@ default_config = {
         "Pitch Down":                   [(1,1), None],
         "Roll Left":                    [(0,-1), None],
         "Roll Right":                   [(0,1), None],
-        "Arm Open":                     [None, None],
+        "Arm Open":                     [10, None],
         "Arm Close":                    [0, None],
         "Take Photo":                   [1, None],
     },

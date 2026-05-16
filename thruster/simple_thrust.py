@@ -29,7 +29,7 @@ mixer = np.array([
 ])
 #format for thruster outputs is [FL, FR, BL, BR, MFL, MFR, MBL, MBR]
 
-thruster_pins = []  # Example GPIO pins for 8 thrusters/ESCs
+thruster_pins = [16,17,27,22,25,26]  # Example GPIO pins for 8 thrusters/ESCs
 
 class Thruster:
     '''Class to control thrusters using the mixer and GPIO pins'''
@@ -41,7 +41,7 @@ class Thruster:
             print("Failed to connect to pigpio daemon")
 
         # Initialize thruster systems
-        self.mixer = mixer
+        self.mixer = np.array(mixer)  # Mixer matrix to convert DOF inputs to thruster outputs
         self.thruster_pins = thruster_pins
         self.amperage_limit_per_unit = AMPERAGE_LIMIT / thruster_pins.__len__() # Amperage limit per thruster
         
@@ -54,6 +54,8 @@ class Thruster:
         Input is a 6-element array: [Surge, Sway, Heave, Roll, Pitch, Yaw], each in range [-1, 1]
         Comes from get_input_vector() func in controls.py, which will be called in the main loop of the program.
         '''
+        print("mixer shape:", self.mixer.shape)  # Should be (N, 6) or similar 2D
+        print("input shape:", input.shape)  
         thruster_outputs = np.matmul(self.mixer, input)  # Matrix multiplication to get thruster outputs
         max_value = np.max(np.abs(thruster_outputs))
         if max_value > 1:
@@ -73,7 +75,7 @@ class Thruster:
             self.pi.set_servo_pulsewidth(self.thruster_pins[pin], ESC_NEUTRAL)
 
 if __name__ == "__main__":
-    thrustsys = Thruster(mixer, [16, 17, 22, 25, 26, 27])
+    thrustsys = Thruster("192.168.0.2", 8888,mixer, [16, 17, 22, 25, 26, 27])
     thrustsys.set_thruster([1, 0, 0, 0, 0, 0])  # Example input vector for surge forward
     time.sleep(5)
     thrustsys.stop()
